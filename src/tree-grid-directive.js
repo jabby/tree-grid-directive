@@ -9,8 +9,8 @@
           " <table class=\"table tree-grid\">\n" +
           "   <thead>\n" +
           "     <tr>\n" +
-          "       <th><a ng-if=\"expandingProperty.sortable\" ng-click=\"sortBy(expandingProperty)\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</a><span ng-if=\"!expandingProperty.sortable\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</span><i ng-if=\"expandingProperty.sorted\" class=\"{{expandingProperty.sortingIcon}} pull-right\"></i></th>\n" +
-          "       <th ng-repeat=\"col in colDefinitions\"><a ng-if=\"col.sortable\" ng-click=\"sortBy(col)\">{{col.displayName || col.field}}</a><span ng-if=\"!col.sortable\">{{col.displayName || col.field}}</span><i ng-if=\"col.sorted\" class=\"{{col.sortingIcon}} pull-right\"></i></th>\n" +
+          "       <th><a ng-if=\"expandingProperty.sortable\" ng-click=\"sortBy(expandingProperty)\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</a><span ng-if=\"!expandingProperty.sortable\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</span><i ng-if=\"expandingProperty.sorted || expandingProperty.enableResetSort\" class=\"{{expandingProperty.sortingIcon}} pull-right\"></i></th>\n" +
+          "       <th ng-repeat=\"col in colDefinitions\"><a ng-if=\"col.sortable\" ng-click=\"sortBy(col)\">{{col.displayName || col.field}}</a><span ng-if=\"!col.sortable\">{{col.displayName || col.field}}</span><i ng-if=\"col.sorted || col.enableResetSort\" class=\"{{col.sortingIcon}} pull-right\"></i></th>\n" +
           "     </tr>\n" +
           "   </thead>\n" +
           "   <tbody>\n" +
@@ -89,7 +89,7 @@
             treeControl     : '='
           },
           link       : function (scope, element, attrs) {
-            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
+            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree, savedTreeData;
 
             error = function (s) {
               console.log('ERROR:' + s);
@@ -102,6 +102,7 @@
             attrs.iconLeaf = attrs.iconLeaf ? attrs.iconLeaf : 'icon-file  glyphicon glyphicon-file  fa fa-file';
             attrs.sortedAsc = attrs.sortedAsc ? attrs.sortedAsc : 'icon-file  glyphicon glyphicon-chevron-up  fa angle-up';
             attrs.sortedDesc = attrs.sortedDesc ? attrs.sortedDesc : 'icon-file  glyphicon glyphicon-chevron-down  fa angle-down';
+            attrs.iconNoSort = attrs.iconNoSort ? attrs.iconNoSort : 'icon-file  glyphicon glyphicon-sort  fa fa-sort'
             attrs.expandLevel = attrs.expandLevel ? attrs.expandLevel : '3';
             expand_level = parseInt(attrs.expandLevel, 10);
 
@@ -109,7 +110,9 @@
               alert('No data was defined for the tree, please define treeData!');
               return;
             }
-
+            
+            savedTreeData = angular.copy(scope.treeData);
+            
             var getExpandingProperty = function getExpandingProperty() {
               if (attrs.expandOn) {
                 expandingProperty = scope.expandOn;
@@ -127,6 +130,10 @@
                   if (!expandingProperty) expandingProperty = _keys[0];
                   scope.expandingProperty = expandingProperty;
                 }
+              }
+              
+              if (scope.expandingProperty.enableResetSort) {
+                scope.expandingProperty = attrs.iconNoSort;
               }
             };
 
@@ -149,6 +156,12 @@
             } else {
               scope.colDefinitions = scope.colDefs;
             }
+            
+            scope.colDefinitions.forEach(function(col) {
+              if (col.enableResetSort) {
+                col.sortingIcon = attrs.iconNoSort;
+              }
+            });
 
             for_each_branch = function (f) {
               var do_f, root_branch, _i, _len, _ref, _results;
@@ -219,18 +232,24 @@
             
             /* sorting methods */
             scope.sortBy = function (col) {
-            	if (col.sortDirection === "asc") {
-                 sort_recursive(scope.treeData, col, true);
-            	   col.sortDirection = "desc";
-       	           col.sortingIcon = attrs.sortedDesc;
-            	} else {
-            	   sort_recursive(scope.treeData, col, false);
-             	   col.sortDirection = "asc";
-        	       col.sortingIcon = attrs.sortedAsc;
-            	}
-          	    col.sorted = true;
-                resetSorting(col);
-              };
+              if (col.sortDirection === "asc") {
+                sort_recursive(scope.treeData, col, true);
+                col.sortDirection = "desc";
+                col.sortingIcon = attrs.sortedDesc;
+              } else if (col.enableResetSort && col.sortDirection === "desc") {
+                col.sorted = false;
+                col.sortDirection = "none";
+                col.sortingIcon = attrs.iconNoSort;
+                scope.treeData.splice(0, scope.treeData.length);              
+                Array.prototype.push.apply(scope.treeData, savedTreeData);
+              } else {
+                sort_recursive(scope.treeData, col, false);
+                col.sortDirection = "asc";
+                col.sortingIcon = attrs.sortedAsc;
+              }
+              col.sorted = true;
+              resetSorting(col);
+            };
 
             var sort_recursive = function(elements, col, descending) {
               elements.sort(sort_by(col, descending));
@@ -655,6 +674,10 @@
                 };
               }
             }
+            
+            // Workaround
+            scope.treeData.splice(0, scope.treeData.length);              
+            Array.prototype.push.apply(scope.treeData, savedTreeData);
           }
         };
       }

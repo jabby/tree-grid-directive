@@ -3,7 +3,7 @@
   <head>
     <!-- for local development -->    
     <!-- <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="../src/treeGrid.css">    
   </head>
   <body ng-controller="treeGridController" style="margin:20px">
@@ -17,6 +17,20 @@
         <button ng-click="showMinDir=false" class="btn btn-primary btn-sm">Use standard directive</button>
         <button ng-click="showMinDir=true" class="btn btn-primary btn-sm">Use minimum directive</button>
         <br/><br/>
+        
+        <tree-grid 
+            tree-data="treeData" 
+            tree-control="myTree" 
+            col-defs="colDefs" 
+            expand-on="expandingProperty" 
+            on-select="myTreeHandler(branch)"
+            expand-level="0"
+            icon-leaf="glyphicon" 
+            icon-expand   = "glyphicon glyphicon-triangle-right"
+            icon-collapse = "glyphicon glyphicon-triangle-bottom"
+        ></tree-grid>
+        
+        
         <div ng-show="!showMinDir">
             <strong>standard directive: </strong><code>&lt;tree-grid tree-data="tree_data" tree-control="my_tree" col-defs="col_defs" expand-on="expanding_property" on-select="my_tree_handler(branch)" expand-level="2" icon-leaf= "glyphicon glyphicon-globe"&gt;&lt;/tree-grid&gt;</code>
             <br/>
@@ -33,7 +47,7 @@
             <tree-grid tree-data="tree_data"></tree-grid>
         </div>
     </div>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
     <!-- for local development -->
     <!--
         <script src="../lib/angular/angular.min.js"></script>
