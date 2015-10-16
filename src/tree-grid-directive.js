@@ -80,7 +80,7 @@
           },
           replace    : true,
           scope      : {
-            treeData        : '=',
+            data        : '=treeData',
             colDefs         : '=',
             expandOn        : '=',
             onSelect        : '&',
@@ -89,7 +89,8 @@
             treeControl     : '='
           },
           link       : function (scope, element, attrs) {
-            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree, savedTreeData;
+            scope.treeData = [];
+            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
 
             error = function (s) {
               console.log('ERROR:' + s);
@@ -106,12 +107,10 @@
             attrs.expandLevel = attrs.expandLevel ? attrs.expandLevel : '3';
             expand_level = parseInt(attrs.expandLevel, 10);
 
-            if (!scope.treeData) {
+            if (!scope.data) {
               alert('No data was defined for the tree, please define treeData!');
               return;
             }
-            
-            savedTreeData = angular.copy(scope.treeData);
             
             var getExpandingProperty = function getExpandingProperty() {
               if (attrs.expandOn) {
@@ -241,7 +240,7 @@
                 col.sortDirection = "none";
                 col.sortingIcon = attrs.iconNoSort;
                 scope.treeData.splice(0, scope.treeData.length);              
-                Array.prototype.push.apply(scope.treeData, savedTreeData);
+                Array.prototype.push.apply(scope.treeData, scope.data);
               } else {
                 sort_recursive(scope.treeData, col, false);
                 col.sortDirection = "asc";
@@ -420,6 +419,9 @@
               return _results;
             };
 
+            scope.$watch('data', function() {
+              scope.treeData = angular.copy(scope.data);
+            });
             scope.$watch('treeData', on_treeData_change, true);
 
             if (attrs.initialSelection != null) {
