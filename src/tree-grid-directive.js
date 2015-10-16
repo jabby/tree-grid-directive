@@ -289,7 +289,7 @@
             	var arraySize = scope.colDefinitions.length;
             	for (var i= 0;i<arraySize;i++) {
             		var col = scope.colDefinitions[i];
-            		if (col.field != sortedCol.field) {
+            		if (!sortedCol || col.field != sortedCol.field) {
             			col.sorted = false;
                 		col.sortDirection = "none";	
             		}
@@ -421,6 +421,7 @@
 
             scope.$watch('data', function() {
               scope.treeData = angular.copy(scope.data);
+              resetSorting(col);
             });
             scope.$watch('treeData', on_treeData_change, true);
 
