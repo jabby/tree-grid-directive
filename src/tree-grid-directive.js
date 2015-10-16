@@ -90,7 +90,7 @@
           },
           link       : function (scope, element, attrs) {
             scope.treeData = [];
-            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
+            var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree, unSelectBranch;
 
             error = function (s) {
               console.log('ERROR:' + s);
@@ -206,6 +206,24 @@
                 }
               }
             };
+            
+            unSelectBranch = function(branch) {
+              if (selected_branch != null) {
+                selected_branch.selected = false;
+              }
+              selected_branch = null;
+              
+              if (branch && branch.onSelect != null) {
+                return $timeout(function () {
+                  return branch.onSelect(branch);
+                });
+              } else if (scope.onSelect != null) {
+                return $timeout(function () {
+                  return scope.onSelect();
+                });
+              }
+            }
+            
             scope.on_user_click = function (branch) {
               if (scope.onClick) {
                 scope.onClick({
@@ -216,6 +234,8 @@
             scope.user_clicks_branch = function (branch) {
               if (branch !== selected_branch) {
                 return select_branch(branch);
+              } else {
+                return unSelectBranch(branch);
               }
             };
             
@@ -276,14 +296,16 @@
             }
 
             var resetSorting = function(sortedCol) {
+              if (scope.colDefinitions) {
             	var arraySize = scope.colDefinitions.length;
             	for (var i= 0;i<arraySize;i++) {
-            		var col = scope.colDefinitions[i];
-            		if (!sortedCol || col.field != sortedCol.field) {
-            			col.sorted = false;
-                		col.sortDirection = "none";	
-            		}
+            	  var col = scope.colDefinitions[i];
+            	  if (!sortedCol || col.field != sortedCol.field) {
+            	  	col.sorted = false;
+                    col.sortDirection = "none";	
+            	  }
             	}
+              }
             }
               
             /* end of sorting methods */
@@ -667,10 +689,6 @@
                 };
               }
             }
-            
-            // Workaround
-            scope.treeData.splice(0, scope.treeData.length);              
-            Array.prototype.push.apply(scope.treeData, savedTreeData);
           }
         };
       }
