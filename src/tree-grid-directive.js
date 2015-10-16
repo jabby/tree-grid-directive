@@ -10,7 +10,7 @@
           "   <thead>\n" +
           "     <tr>\n" +
           "       <th><a ng-if=\"expandingProperty.sortable\" ng-click=\"sortBy(expandingProperty)\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</a><span ng-if=\"!expandingProperty.sortable\">{{expandingProperty.displayName || expandingProperty.field || expandingProperty}}</span><i ng-if=\"expandingProperty.sorted || expandingProperty.enableResetSort\" class=\"{{expandingProperty.sortingIcon}} pull-right\"></i></th>\n" +
-          "       <th ng-repeat=\"col in colDefinitions\"><a ng-if=\"col.sortable\" ng-click=\"sortBy(col)\">{{col.displayName || col.field}}</a><span ng-if=\"!col.sortable\">{{col.displayName || col.field}}</span><i ng-if=\"col.sorted || col.enableResetSort\" class=\"{{col.sortingIcon}} pull-right\"></i></th>\n" +
+          "       <th ng-repeat=\"col in colDefinitions\"><a ng-if=\"col.sortable\" ng-click=\"sortBy(col)\">{{col.displayName || col.field}}</a><span ng-if=\"!col.sortable\">{{col.displayName || col.field}}</span><i ng-if=\"col.sorted\" class=\"{{col.sortingIcon}} pull-right\"></i><i ng-if=\"!col.sorted && col.enableResetSort\" class=\"{{iconNoSort}} pull-right\"></i></th>\n" +
           "     </tr>\n" +
           "   </thead>\n" +
           "   <tbody>\n" +
@@ -103,7 +103,7 @@
             attrs.iconLeaf = attrs.iconLeaf ? attrs.iconLeaf : 'icon-file  glyphicon glyphicon-file  fa fa-file';
             attrs.sortedAsc = attrs.sortedAsc ? attrs.sortedAsc : 'icon-file  glyphicon glyphicon-chevron-up  fa angle-up';
             attrs.sortedDesc = attrs.sortedDesc ? attrs.sortedDesc : 'icon-file  glyphicon glyphicon-chevron-down  fa angle-down';
-            attrs.iconNoSort = attrs.iconNoSort ? attrs.iconNoSort : 'icon-file  glyphicon glyphicon-sort  fa fa-sort'
+            scope.iconNoSort = attrs.iconNoSort ? attrs.iconNoSort : 'icon-file  glyphicon glyphicon-sort  fa fa-sort'
             attrs.expandLevel = attrs.expandLevel ? attrs.expandLevel : '3';
             expand_level = parseInt(attrs.expandLevel, 10);
 
@@ -130,10 +130,6 @@
                   scope.expandingProperty = expandingProperty;
                 }
               }
-              
-              if (scope.expandingProperty.enableResetSort) {
-                scope.expandingProperty = attrs.iconNoSort;
-              }
             };
 
             getExpandingProperty();
@@ -155,12 +151,6 @@
             } else {
               scope.colDefinitions = scope.colDefs;
             }
-            
-            scope.colDefinitions.forEach(function(col) {
-              if (col.enableResetSort) {
-                col.sortingIcon = attrs.iconNoSort;
-              }
-            });
 
             for_each_branch = function (f) {
               var do_f, root_branch, _i, _len, _ref, _results;
@@ -231,6 +221,7 @@
             
             /* sorting methods */
             scope.sortBy = function (col) {
+              col.sorted = true;
               if (col.sortDirection === "asc") {
                 sort_recursive(scope.treeData, col, true);
                 col.sortDirection = "desc";
@@ -238,7 +229,7 @@
               } else if (col.enableResetSort && col.sortDirection === "desc") {
                 col.sorted = false;
                 col.sortDirection = "none";
-                col.sortingIcon = attrs.iconNoSort;
+                col.sortingIcon = '';
                 scope.treeData.splice(0, scope.treeData.length);              
                 Array.prototype.push.apply(scope.treeData, scope.data);
               } else {
@@ -246,7 +237,6 @@
                 col.sortDirection = "asc";
                 col.sortingIcon = attrs.sortedAsc;
               }
-              col.sorted = true;
               resetSorting(col);
             };
 
@@ -421,7 +411,7 @@
 
             scope.$watch('data', function() {
               scope.treeData = angular.copy(scope.data);
-              resetSorting(col);
+              resetSorting();
             });
             scope.$watch('treeData', on_treeData_change, true);
 

@@ -55,6 +55,58 @@
                             }
                           ];
 
+        
+        $scope.reload = function() {
+            $scope.treeData = [
+             {
+                 id: 201,
+                 type: 'Exigence',
+                 description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                 numero: '14',
+                 children: []
+               },{
+                 id: 1,
+                 type: 'Exigence',
+                 description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                 numero: '13',
+                 children: [
+                   {
+                     id: 2,
+                     type: 'Condition',
+                     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                     numero: '13.1'
+                   },
+                   {
+                     id: 5,
+                     type: 'Condition',
+                     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                     numero: '13.2'
+                   },
+                   {
+                     id: 7,
+                     type: 'Condition',
+                     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                     numero: '13.3'
+                   },
+                   {
+                     id: 8,
+                     type: 'Condition',
+                     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                     numero: '13.4'
+                   }
+                 ]
+               },
+               {
+                 id: 301,
+                 type: 'Exigence',
+                 description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis at?',
+                 numero: '15',
+                 children: []
+               }
+             ]  
+        };
+        
+        
         $scope.treeData = myTreeData;    
         $scope.myTree = {};
         $scope.expandingProperty = {field: 'expand', displayName: ' '};
