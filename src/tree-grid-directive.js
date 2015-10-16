@@ -105,6 +105,8 @@
             attrs.sortedDesc = attrs.sortedDesc ? attrs.sortedDesc : 'icon-file  glyphicon glyphicon-chevron-down  fa angle-down';
             scope.iconNoSort = attrs.iconNoSort ? attrs.iconNoSort : 'icon-file  glyphicon glyphicon-sort  fa fa-sort'
             attrs.expandLevel = attrs.expandLevel ? attrs.expandLevel : '3';
+            attrs.onlyLeafSelectable = attrs.onlyLeafSelectable ? attrs.onlyLeafSelectable : false; 
+            
             expand_level = parseInt(attrs.expandLevel, 10);
 
             if (!scope.data) {
@@ -231,9 +233,14 @@
                 });
               }
             };
+            
             scope.user_clicks_branch = function (branch) {
               if (branch !== selected_branch) {
-                return select_branch(branch);
+                if (attrs.onlyLeafSelectable && branch.children && !branch.children.length
+                        || !attrs.onlyLeafSelectable) {
+                    return select_branch(branch);
+                }
+                return;
               } else {
                 return unSelectBranch(branch);
               }
@@ -411,6 +418,11 @@
                   tree_icon: tree_icon,
                   visible  : visible
                 });
+                
+                if (branch === selected_branch && !visible) {
+                  unSelectBranch(branch);
+                }
+                
                 if (branch.children != null) {
                   _ref = branch.children;
                   _results = [];
