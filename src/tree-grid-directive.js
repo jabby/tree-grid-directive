@@ -235,12 +235,20 @@
             };
             
             scope.user_clicks_branch = function (branch) {
+<<<<<<< HEAD
               if (branch !== selected_branch) {
                 if (attrs.onlyLeafSelectable && branch.children && !branch.children.length
                         || !attrs.onlyLeafSelectable) {
                     return select_branch(branch);
                 }
                 return;
+=======
+              if (branch !== selected_branch 
+                      && (attrs.onlyLeafSelectable && branch.children && !branch.children.length
+                              || !attrs.onlyLeafSelectable
+                         )) {
+                return select_branch(branch);
+>>>>>>> branch 'feature/reset-sort-on-column' of https://github.com/jabby/tree-grid-directive.git
               } else {
                 return unSelectBranch(branch);
               }
